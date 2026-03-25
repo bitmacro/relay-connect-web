@@ -5,7 +5,7 @@
 **[→ Relay Panel](https://relay-panel.bitmacro.io)**  
 **[→ BitMacro](https://bitmacro.io)**
 
-Minimal **Next.js** app for **NIP-46 (Nostr Connect)** flows against **relay-api** `/signer` (session + QR + bridge). Part of the [BitMacro Relay Manager](https://bitmacro.io) ecosystem.
+Minimal **Next.js** app for **NIP-46 (Nostr Connect)** and optional **NIP-07 (browser extension)** sign-in. NIP-46 uses **relay-api** `/signer` (session + QR + bridge); NIP-07 is client-only except for metadata fetched from relays. Part of the [BitMacro Relay Manager](https://bitmacro.io) ecosystem.
 
 | Project | Role | License |
 |---------|------|---------|
@@ -20,10 +20,22 @@ Minimal **Next.js** app for **NIP-46 (Nostr Connect)** flows against **relay-api
 
 ## What it does
 
-- Server-only auth to **relay-api**: `RELAY_API_KEY` + `SIGNER_PROVIDER_USER_ID` (GitHub numeric id, same as `relay_configs.provider_user_id`).
+- Server-only auth to **relay-api** (NIP-46 path): `RELAY_API_KEY` + `SIGNER_PROVIDER_USER_ID` (GitHub numeric id, same as `relay_configs.provider_user_id`).
 - Browser calls **Next.js** `/api/signer/*`, which proxies to `RELAY_API_URL/signer/*`.
-- **NIP-46:** `POST /signer/connect`, QR from `nostrconnect_uri`, polling `GET /signer/sessions`, optional bridge subscribe (`kind` 24133), `POST /signer/session/:id/complete`.
-- **BitMacro relays:** when `relay_configs.endpoint` is `https://relay-agent.bitmacro.io`, `bridge_wss` is resolved from `agent_relay_id` (`public` → `wss://relay.bitmacro.cloud`, etc.). Override with `NEXT_PUBLIC_RELAY_BRIDGE_WSS` if needed.
+- **NIP-46 (remote signer):** `POST /signer/connect`, QR from `nostrconnect_uri`, polling `GET /signer/sessions`, bridge subscribe (`kind` 24133), `POST /signer/session/:id/complete`. Creates rows in Supabase **`relay.nip46_sessions`** via relay-api.
+- **NIP-07 (browser extension):** uses [`window.nostr`](https://github.com/nostr-protocol/nips/blob/master/07.md) (`getPublicKey`). **No** calls to `/signer` and **no** writes to Supabase for that path. If no extension is detected, the user is redirected to **[nostrapps.com signers](https://nostrapps.com/#signers)** to choose a signer app.
+- After NIP-07, the app loads **kind 0** profile metadata from configurable relays (`NEXT_PUBLIC_NIP07_METADATA_RELAYS` and/or `NEXT_PUBLIC_RELAY_BRIDGE_WSS` + defaults), optional `getRelays()` introspection when the extension supports it, then `/success` shows **npub** (NIP-19), QR, and technical details.
+
+### NIP-46 vs NIP-07 (summary)
+
+| | NIP-46 | NIP-07 |
+|---|--------|--------|
+| **relay-api / proxy** | Yes | No (only relay reads for profile) |
+| **Supabase** | `nip46_sessions` | Not used |
+| **Typical pubkey shown** | App keypair (NIP-46 client) for the session | User’s pubkey from the extension |
+| **Profile enrichment** | Optional (kind 0 for that pubkey) | Yes — kind 0 + extension hints when available |
+
+- **BitMacro relays (NIP-46):** when `relay_configs.endpoint` is `https://relay-agent.bitmacro.io`, `bridge_wss` is resolved from `agent_relay_id` (`public` → `wss://relay.bitmacro.cloud`, etc.). Override with `NEXT_PUBLIC_RELAY_BRIDGE_WSS` if needed.
 
 ---
 
@@ -54,7 +66,8 @@ This app was previously named **identity-gate**. Stop any dev server, remove the
 | `RELAY_API_KEY` | Server | Same key as relay-api `RELAY_API_KEY` |
 | `SIGNER_PROVIDER_USER_ID` | Server | GitHub user id string (`provider_user_id` in `relay_configs`) |
 | `SIGNER_PROXY_TIMEOUT_MS` | Server | Optional. Proxy fetch timeout (ms), default 60000 |
-| `NEXT_PUBLIC_RELAY_BRIDGE_WSS` | Client | Optional. Force NIP-46 bridge `wss://…` |
+| `NEXT_PUBLIC_RELAY_BRIDGE_WSS` | Client | Optional. Force NIP-46 bridge `wss://…`; also used as first relay when fetching kind 0 after NIP-07 |
+| `NEXT_PUBLIC_NIP07_METADATA_RELAYS` | Client | Optional. Comma/space-separated `wss://` URLs to query kind 0 after NIP-07 (defaults + bridge above) |
 | `NEXT_PUBLIC_RELAY_CONFIG_ID` | Client | Optional. UUID of `relay_configs` row to use |
 
 Never expose `RELAY_API_KEY` in the browser; keep it in `.env` for the Next server only.

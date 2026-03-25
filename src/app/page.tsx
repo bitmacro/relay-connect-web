@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { QRCodeSVG } from "qrcode.react";
-import { Briefcase, Loader2, RefreshCw } from "lucide-react";
+import { Loader2, Puzzle, RefreshCw, Smartphone } from "lucide-react";
 import { signerFetch } from "@/lib/relaySigner";
 import {
   getOrCreateAppKeypair,
@@ -11,9 +11,12 @@ import {
 } from "@/lib/nostrAppKeys";
 import { watchNip46Bridge } from "@/lib/nip46Bridge";
 import { resolveBridgeWss } from "@/lib/relayUrl";
+import { fetchNip07ProfileBundle, STORAGE_NIP07_PROFILE_KEY } from "@/lib/nip07Metadata";
 import { igError, igLog, igWarn } from "@/lib/igLog";
 
 const STORAGE_PUBKEY = "relay_connect_display_pubkey";
+/** When no NIP-07 extension is present, send users to pick a signer app. */
+const NOSTR_APPS_SIGNERS_URL = "https://nostrapps.com/#signers";
 
 const POLL_MS = 2000;
 const TIMEOUT_MS = 5 * 60 * 1000;
@@ -127,6 +130,7 @@ export default function HomePage() {
       }
       clearTimers();
       const pk = row.app_pubkey ?? getOrCreateAppKeypair().appPubkeyHex;
+      sessionStorage.removeItem(STORAGE_NIP07_PROFILE_KEY);
       sessionStorage.setItem(STORAGE_PUBKEY, pk);
       setPhase("redirecting");
       router.push("/success");
@@ -179,6 +183,7 @@ export default function HomePage() {
   );
 
   const handleConnect = async () => {
+    sessionStorage.removeItem(STORAGE_NIP07_PROFILE_KEY);
     setFailureReason(null);
     setFailureDetail(null);
     setPhase("loading");
@@ -339,6 +344,39 @@ export default function HomePage() {
     }
   };
 
+  /** NIP-07: browser extension (`window.nostr`). No relay-api session. */
+  const handleNip07 = async () => {
+    if (typeof window === "undefined") return;
+    const nip = window.nostr;
+    if (!nip || typeof nip.getPublicKey !== "function") {
+      igLog("[nip07] window.nostr missing — redirect", NOSTR_APPS_SIGNERS_URL);
+      window.location.assign(NOSTR_APPS_SIGNERS_URL);
+      return;
+    }
+    setFailureReason(null);
+    setFailureDetail(null);
+    setPhase("loading");
+    igLog("[nip07] calling getPublicKey()");
+    try {
+      const pk = await nip.getPublicKey();
+      const hex = typeof pk === "string" ? pk.trim() : "";
+      if (!/^[0-9a-fA-F]{64}$/.test(hex)) {
+        throw new Error("Extension did not return a valid 64-char hex pubkey.");
+      }
+      const normalized = hex.toLowerCase();
+      const bundle = await fetchNip07ProfileBundle(normalized, nip);
+      sessionStorage.setItem(STORAGE_PUBKEY, bundle.pubkey);
+      sessionStorage.setItem(STORAGE_NIP07_PROFILE_KEY, JSON.stringify(bundle));
+      setPhase("redirecting");
+      router.push("/success");
+    } catch (e) {
+      igError("[nip07] getPublicKey failed", e);
+      setFailureReason("unknown");
+      setFailureDetail(e instanceof Error ? e.message : String(e));
+      setPhase("failure");
+    }
+  };
+
   const handleRetry = () => {
     igLog("[flow] retry — reset state");
     clearTimers();
@@ -372,14 +410,28 @@ export default function HomePage() {
   return (
     <main className="flex min-h-dvh flex-col items-center justify-center px-6 py-16">
       {phase === "idle" && (
-        <button
-          type="button"
-          onClick={() => void handleConnect()}
-          className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-10 py-3.5 text-[15px] font-medium tracking-tight text-primary-foreground shadow-sm transition hover:bg-zinc-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
-        >
-          <Briefcase className="h-4 w-4 shrink-0" aria-hidden />
-          Use remote signer
-        </button>
+        <div className="flex w-full max-w-xs flex-col items-stretch gap-3">
+          <button
+            type="button"
+            onClick={() => void handleConnect()}
+            className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-10 py-3.5 text-[15px] font-medium tracking-tight text-primary-foreground shadow-sm transition hover:bg-zinc-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
+          >
+            <Smartphone className="h-4 w-4 shrink-0 stroke-[2]" aria-hidden />
+            Use remote signer
+          </button>
+          <button
+            type="button"
+            onClick={() => void handleNip07()}
+            className="inline-flex items-center justify-center gap-2 rounded-full border border-zinc-600 bg-zinc-900/80 px-10 py-3.5 text-[15px] font-medium tracking-tight text-zinc-100 transition hover:border-zinc-500 hover:bg-zinc-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-500 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
+          >
+            <Puzzle className="h-4 w-4 shrink-0 stroke-[2]" aria-hidden />
+            Use browser extension
+          </button>
+          <p className="text-center text-[11px] leading-snug text-zinc-600">
+            No extension? The second button opens a list of signer apps at{" "}
+            <span className="break-all text-zinc-500">nostrapps.com</span>.
+          </p>
+        </div>
       )}
 
       {phase === "loading" && (
