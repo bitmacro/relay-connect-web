@@ -1,6 +1,6 @@
-# Contributing to relay-connect
+# Contributing to relay-connect-web
 
-Thanks for helping improve **relay-connect**.
+Thanks for helping improve **relay-connect-web**.
 
 ## Local setup
 
@@ -20,4 +20,4 @@ Prefer [Conventional Commits](https://www.conventionalcommits.org/) (`feat:`, `f
 
 ## Context
 
-This app is the **reference UI** for relay-api `/signer`. Shared client logic is planned to move into **`@bitmacro/connect`**; keep new “business” helpers ready to extract where it makes sense.
+This app is the **reference UI** for relay-api `/signer`. Shared client logic lives in **`@bitmacro/relay-connect`** ([SDK repo](https://github.com/bitmacro/relay-connect)); keep new “business” helpers ready to extract there where it makes sense.

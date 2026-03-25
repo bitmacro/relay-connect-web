@@ -1,17 +1,17 @@
 {
-  "name": "@bitmacro/relay-connect",
+  "name": "@bitmacro/relay-connect-web",
   "version": "0.1.0",
   "description": "Minimal Next.js app for NIP-46 (Nostr Connect) and relay-api /signer integration",
   "private": true,
   "license": "MIT",
   "author": "BitMacro <contact@bitmacro.io>",
-  "homepage": "https://github.com/bitmacro/relay-connect#readme",
+  "homepage": "https://github.com/bitmacro/relay-connect-web#readme",
   "repository": {
     "type": "git",
-    "url": "https://github.com/bitmacro/relay-connect.git"
+    "url": "https://github.com/bitmacro/relay-connect-web.git"
   },
   "bugs": {
-    "url": "https://github.com/bitmacro/relay-connect/issues"
+    "url": "https://github.com/bitmacro/relay-connect-web/issues"
   },
   "keywords": [
     "nostr",

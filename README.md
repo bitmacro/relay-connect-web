@@ -1,4 +1,4 @@
-# @bitmacro/relay-connect
+# relay-connect-web
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
@@ -9,12 +9,13 @@ Minimal **Next.js** app for **NIP-46 (Nostr Connect)** and optional **NIP-07 (br
 
 | Project | Role | License |
 |---------|------|---------|
-| **relay-connect** | This repo — auth / connect UI + API proxy | MIT |
+| **relay-connect-web** | This repo — auth / connect UI + API proxy | MIT |
+| [@bitmacro/relay-connect](https://github.com/bitmacro/relay-connect) | TypeScript SDK (NIP-46 / NIP-07 client logic) | MIT |
 | [relay-agent](https://github.com/bitmacro/relay-agent) | strfry REST on the operator’s server | MIT |
 | [relay-panel](https://github.com/bitmacro/relay-panel) | Relay management UI | BSL 1.1 |
 | relay-api | Central hub (Supabase, `/signer`, proxy to agents) | Private |
 
-**Roadmap:** logic will move into **`@bitmacro/connect`** (npm) as a shared client between this app, **relay-panel**, and other frontends; **relay-connect** stays the reference UI and integration example.
+**Roadmap:** shared logic moves into **`@bitmacro/relay-connect`** (npm); **relay-connect-web** stays the reference UI and integration example.
 
 ---
 
@@ -42,7 +43,7 @@ Minimal **Next.js** app for **NIP-46 (Nostr Connect)** and optional **NIP-07 (br
 ## Quick start
 
 ```bash
-cd relay-connect
+cd relay-connect-web
 cp .env.example .env
 # Edit .env: RELAY_API_KEY, SIGNER_PROVIDER_USER_ID, optional RELAY_API_URL / NEXT_PUBLIC_*
 npm install
@@ -54,7 +55,7 @@ Requires a **relay-api** deployment with `/signer` routes and Supabase table **`
 
 ### Migrating from `identity-gate`
 
-This app was previously named **identity-gate**. Stop any dev server, remove the old `identity-gate` folder if it is still present, work only from **`relay-connect/`**, and run `npm install`. Browser storage keys use the prefix `relay_connect_*` (new sessions after upgrade).
+This app was previously named **identity-gate**, then lived in the **relay-connect** repo name before the SDK split. Stop any dev server, remove stale clones if needed, work from **`relay-connect-web/`**, and run `npm install`. Browser storage keys use the prefix `relay_connect_*` (new sessions after upgrade).
 
 ---
 
