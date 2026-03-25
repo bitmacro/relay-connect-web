@@ -1,0 +1,56 @@
+{
+  "name": "@bitmacro/relay-connect",
+  "version": "0.1.0",
+  "description": "Minimal Next.js app for NIP-46 (Nostr Connect) and relay-api /signer integration",
+  "private": true,
+  "license": "MIT",
+  "author": "BitMacro <contact@bitmacro.io>",
+  "homepage": "https://github.com/bitmacro/relay-connect#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bitmacro/relay-connect.git"
+  },
+  "bugs": {
+    "url": "https://github.com/bitmacro/relay-connect/issues"
+  },
+  "keywords": [
+    "nostr",
+    "nip-46",
+    "nostr-connect",
+    "relay-manager",
+    "bitmacro",
+    "next.js"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "prebuild": "node scripts/prebuild-clean.mjs",
+    "build": "next build --webpack",
+    "start": "next start",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.0",
+    "lucide-react": "^0.460.0",
+    "next": "^16",
+    "nostr-tools": "^2.23.3",
+    "qrcode.react": "^4.2.0",
+    "react": "^19",
+    "react-dom": "^19",
+    "tailwind-merge": "^2.5.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^22",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "^16",
+    "tailwindcss": "^4",
+    "tw-animate-css": "^1",
+    "typescript": "^5.7"
+  }
+}
