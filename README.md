@@ -62,7 +62,7 @@ npm run dev
 
 Requires a **relay-api** deployment with `/signer` routes and Supabase table **`relay.nip46_sessions`** (see relay-api migrations).
 
-**SDK version:** `package.json` pins `@bitmacro/relay-connect` from npm (`^0.1.1`). Publish that package version ([relay-connect](https://github.com/bitmacro/relay-connect) repo, then `npm publish`) before expecting `npm ci` / Vercel to resolve it. For local dev with sibling clones before publish: `npm install ../relay-connect`.
+**SDK version:** `package.json` pins `@bitmacro/relay-connect` from npm (`^0.1.1`). Prefer `npm install` so the dependency is a **real copy under `node_modules`** — `npm install ../relay-connect` creates a symlink outside the app folder and **Next.js dev (Turbopack) often fails** with “Can’t resolve `@bitmacro/relay-connect`”. Edit the SDK in `../relay-connect`, run `npm pack` / `npm publish`, then `npm update @bitmacro/relay-connect` here (or bump the version).
 
 ### Migrating from `identity-gate`
 
