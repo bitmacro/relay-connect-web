@@ -1,9 +1,16 @@
 # relay-connect-web
 
+[![CI](https://github.com/bitmacro/relay-connect-web/actions/workflows/ci.yml/badge.svg)](https://github.com/bitmacro/relay-connect-web/actions/workflows/ci.yml)
+[![version](https://img.shields.io/badge/version-0.1.0-blue)](https://github.com/bitmacro/relay-connect-web/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/React-19-61dafb?logo=react)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.7-3178c6?logo=typescript)](https://www.typescriptlang.org/)
+[![Node](https://img.shields.io/badge/node-%3E%3D20-brightgreen)](https://nodejs.org/)
+[![SDK](https://img.shields.io/npm/v/@bitmacro/relay-connect?label=%40bitmacro%2Frelay-connect)](https://www.npmjs.com/package/@bitmacro/relay-connect)
 
 **[→ Relay Panel](https://relay-panel.bitmacro.io)**  
-**[→ BitMacro](https://bitmacro.io)**
+**[→ BitMacro: bitmacro.io](https://bitmacro.io)**
 
 Minimal **Next.js** app for **NIP-46 (Nostr Connect)** and optional **NIP-07 (browser extension)** sign-in. NIP-46 uses **relay-api** `/signer` (session + QR + bridge); NIP-07 is client-only except for metadata fetched from relays. Part of the [BitMacro Relay Manager](https://bitmacro.io) ecosystem.
 
