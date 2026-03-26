@@ -15,11 +15,26 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Until @bitmacro/relay-connect@0.1.1 is on npm, install the SDK from this checkout.
+      - uses: actions/checkout@v4
+        with:
+          repository: bitmacro/relay-connect
+          path: relay-connect
+
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
           cache: "npm"
+          cache-dependency-path: package-lock.json
 
-      - run: npm ci
+      - name: Build SDK
+        working-directory: relay-connect
+        run: npm ci && npm run build
+
+      - name: Install web (sibling SDK overrides registry pin)
+        run: |
+          rm -rf node_modules
+          npm install ./relay-connect
+
       - run: npm run lint
       - run: npm run build

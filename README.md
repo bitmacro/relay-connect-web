@@ -14,6 +14,8 @@
 
 Minimal **Next.js** app for **NIP-46 (Nostr Connect)** and optional **NIP-07 (browser extension)** sign-in. NIP-46 uses **relay-api** `/signer` (session + QR + bridge); NIP-07 is client-only except for metadata fetched from relays. Part of the [BitMacro Relay Manager](https://bitmacro.io) ecosystem.
 
+**Branding:** **BitMacro Connect** is the product name; the npm package is **`@bitmacro/relay-connect`**. The footer shows `BitMacro Connect · v… · @bitmacro/relay-connect`.
+
 | Project | Role | License |
 |---------|------|---------|
 | **relay-connect-web** | This repo — auth / connect UI + API proxy | MIT |
@@ -22,7 +24,7 @@ Minimal **Next.js** app for **NIP-46 (Nostr Connect)** and optional **NIP-07 (br
 | [relay-panel](https://github.com/bitmacro/relay-panel) | Relay management UI | BSL 1.1 |
 | relay-api | Central hub (Supabase, `/signer`, proxy to agents) | Private |
 
-**Roadmap:** shared logic moves into **`@bitmacro/relay-connect`** (npm); **relay-connect-web** stays the reference UI and integration example.
+**Roadmap:** shared logic moves into **`@bitmacro/relay-connect`**; **relay-connect-web** stays the reference UI. After publishing a new SDK version, run `npm update @bitmacro/relay-connect` (CI installs the SDK from the [relay-connect](https://github.com/bitmacro/relay-connect) repo when the registry is behind).
 
 ---
 
@@ -60,6 +62,8 @@ npm run dev
 
 Requires a **relay-api** deployment with `/signer` routes and Supabase table **`relay.nip46_sessions`** (see relay-api migrations).
 
+**SDK version:** `package.json` pins `@bitmacro/relay-connect` from npm (`^0.1.1`). Publish that package version ([relay-connect](https://github.com/bitmacro/relay-connect) repo, then `npm publish`) before expecting `npm ci` / Vercel to resolve it. For local dev with sibling clones before publish: `npm install ../relay-connect`.
+
 ### Migrating from `identity-gate`
 
 This app was previously named **identity-gate**, then lived in the **relay-connect** repo name before the SDK split. Stop any dev server, remove stale clones if needed, work from **`relay-connect-web/`**, and run `npm install`. Browser storage keys use the prefix `relay_connect_*` (new sessions after upgrade).
@@ -95,7 +99,8 @@ Never expose `RELAY_API_KEY` in the browser; keep it in `.env` for the Next serv
 
 ## Logging
 
-Console prefix **`[relay-connect]`** in the browser; **`[relay-connect][proxy]`** in the terminal running `npm run dev` for upstream relay-api calls.
+- **App / relay-api:** console prefix **`[relay-connect]`** in the browser; **`[relay-connect][proxy]`** in the terminal running `npm run dev` for upstream relay-api calls.
+- **BitMacro Connect SDK:** `src/components/RelayConnectLogBridge.tsx` registers `setRelayConnectLogSink` and prints structured lines such as `[BitMacro Connect][info] …`. In your own app, replace that with a handler that pushes `RelayConnectLogEntry` into React state, a toast strip, or telemetry — see the SDK README.
 
 ---
 
