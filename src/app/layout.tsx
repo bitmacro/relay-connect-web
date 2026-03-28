@@ -21,6 +21,27 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "Relay Connect | BitMacro",
   description: "NIP-46 (Nostr Connect) and relay-api /signer",
+  icons: {
+    icon: [
+      {
+        url: "/icons/favicon_io/favicon-16x16.png",
+        sizes: "16x16",
+        type: "image/png",
+      },
+      {
+        url: "/icons/favicon_io/favicon-32x32.png",
+        sizes: "32x32",
+        type: "image/png",
+      },
+      { url: "/icons/favicon_io/favicon.ico", sizes: "any" },
+      {
+        url: "/icons/favicon_io/android-chrome-192x192.png",
+        sizes: "192x192",
+        type: "image/png",
+      },
+    ],
+    apple: "/icons/favicon_io/apple-touch-icon.png",
+  },
   other: {
     "relay-connect-product": RELAY_CONNECT_PRODUCT_NAME,
     "relay-connect-sdk": RELAY_CONNECT_VERSION,
